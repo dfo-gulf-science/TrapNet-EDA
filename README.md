@@ -58,4 +58,23 @@ JOIN trapnet_biologicaldetailing ON trapnet_sample.id = trapnet_biologicaldetail
 GROUP BY species_id  -- yes (79 pk -> 161996 tsn, atlantic salmon) 
 
 
+-- how many samples have sweep_number == 0?
+-- plenty
+SELECT sweep_number, COUNT(*) FROM trapnet_specimen
+JOIN trapnet_sweep ON trapnet_specimen.sweep_id = trapnet_sweep.id
+GROUP BY sweep_number
+
+-- how many samples have sweep_number == 0 and include historical data?
+-- only 6 (as found in archived data)
+SELECT sweep_number, COUNT(*) FROM trapnet_specimen
+JOIN trapnet_sweep ON trapnet_specimen.sweep_id = trapnet_sweep.id
+WHERE trapnet_specimen.sample_id IN (
+	SELECT trapnet_sample.id
+		FROM trapnet_sample
+			JOIN trapnet_biologicaldetailing ON trapnet_biologicaldetailing.sample_id = trapnet_sample.id
+			JOIN trapnet_specimen ON trapnet_specimen.sample_id = trapnet_sample.id
+	GROUP BY trapnet_sample.id
+	)
+GROUP BY sweep_number
+
 ```
