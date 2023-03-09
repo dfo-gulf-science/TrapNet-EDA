@@ -1,6 +1,8 @@
 # TrapNet-EDA
 Exploring archived and current data to see if we can match biological samples with normal specimen within our database.
 
+NOTE: Initially I referred to biological samples as 'historical' based on the nature if this task. However, biological detailing is a more apt name, so I have switched. However, 'hist' remains throughout the analysis (e.g., 'hist', 'n_hist', 'df_hist'), where it refers to the biologicaldetailing table.
+
 # Summary of Findings
 1. Data import into dm_apps was 1-1 with archived data.
     * one import issue with 6 specimen occurred when fork_length == Null - these bio samples were classified as normal specimen even though they have sex info
@@ -110,5 +112,20 @@ WHERE trapnet_specimen.sample_id IN (
 	GROUP BY trapnet_sample.id
 	)
 GROUP BY sweep_number
+
+
+-- percent of sex_id in spec table
+SELECT SUM(sex_id NOTNULL)*100.0 / COUNT(*) AS '% with sex_id' FROM trapnet_specimen
+
+-- percent of sex_id in bio table
+SELECT SUM(sex_id NOTNULL)*100.0 / COUNT(*) AS '% with sex_id' FROM trapnet_biologicaldetailing
+
+-- percent of weight in spec table
+SELECT SUM(weight NOTNULL)*100.0 / COUNT(*) AS '% with weight' FROM trapnet_specimen
+
+-- percent of weight in bio table
+SELECT SUM(weight NOTNULL)*100.0 / COUNT(*) AS '% with weight' FROM trapnet_biologicaldetailing
+
+
 
 ```
