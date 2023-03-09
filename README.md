@@ -1,7 +1,7 @@
 # TrapNet-EDA
 Exploring archived and current data to see if we can match biological samples with normal specimen within our database.
 
-NOTE: Initially I referred to biological samples as 'historical' based on the nature if this task. However, biological detailing is a more apt name, so I have switched. However, 'hist' remains throughout the analysis (e.g., 'hist', 'n_hist', 'df_hist'), where it refers to the biologicaldetailing table.
+NOTE: Initially, I referred to biological detailing specimen as 'historical' based on the nature if this data analysis task. However, 'biological detailing' is a more apt name (or 'bio' for short), so I have switched. However, 'hist' and 'historical' remain throughout the analysis (e.g., 'hist', 'n_hist', 'df_hist'), where they refer to the biologicaldetailing table.
 
 # Summary of Findings
 1. Data import into dm_apps was 1-1 with archived data.
