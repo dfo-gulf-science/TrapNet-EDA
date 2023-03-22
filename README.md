@@ -56,9 +56,74 @@ NOTE: Initially, I referred to biological detailing specimen as 'historical' bas
 
 # APPENDIX
 
-# Useful SQL Queries
+## Matching Algorithm
+
+```py
+
+def match_spec_and_bio(df_specimen, df_bio, n_sample, debug=False, right=True):
+    
+    """ right=True means bins are right inclusive, this is the lowest error option by a significant margin (see below) """
+
+    # create bins for fork lengths, create lists representing counts per bin
+    bins = [x for x in range(20, 170, 5)]
+    bin_s = df_specimen[df_specimen.sample_id==n_sample].groupby(pd.cut(df_specimen.fork_length, bins, right=right)).fork_length.count().to_list()
+    bin_b = df_bio[df_bio.sample_id==n_sample].groupby(pd.cut(df_bio.fork_length, bins, right=right)).fork_length.count().to_list()
+    
+    if debug:
+        print('bins')
+        print(bin_s)
+        print(bin_b)
+        print()
+    
+    # difference between two lists of fish counts
+    list_diff = []
+    for i, bin in enumerate(bin_b):
+        bin_s[i] = bin_s[i] - bin
+        list_diff += [bin_s[i]]
+        
+    # evaluate how far negative counts (unmatched fish) are from matchable entries
+    n = 0
+    i_max = len(list_diff)
+    for i, bin in enumerate(list_diff):
+        if debug:
+            print(i, 'list_diff')
+            print(list_diff)
+        if bin < 0:
+            for j in range(1, i_max):  
+                if i-j >= 0:
+                    if (subtract := list_diff[i-j]) > 0:
+                        subtract = subtract if subtract <= -bin else -bin
+                        list_diff[i-j] -= subtract
+                        bin += subtract
+                        n += j * subtract
+                        if bin == 0:
+                            break  # break the j loop   
+                if i+j < i_max:
+                    if (subtract := list_diff[i+j]) > 0:
+                        subtract = subtract if subtract <= -bin else -bin
+                        list_diff[i+j] -= subtract
+                        bin += subtract
+                        n += j * subtract
+                        if bin == 0:
+                            break
+            list_diff[i] = bin
+
+            if bin < 0:  # unmatchable penalty
+                return 9999
+
+    if debug:
+        print()
+        print(n)
+        print(list_diff)
+
+    return n * 5  # 5 is the bin width, ie, the error per fish per bin distance
+
 
 ```
+
+## Useful SQL Queries
+
+```SQL
 -- number of samples with historical and specimen data
 SELECT COUNT(*) FROM (
 	SELECT trapnet_sample.id
